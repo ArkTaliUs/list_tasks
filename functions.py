@@ -19,10 +19,14 @@ tasks = []
 #Main Function
 def view_list():
 	for task in tasks:
-		if not task.completed:
+		if not task.completed and task.max_variable != "":
+			print(f"[{task.id_task}][X]{task.description} {task.variable}/{task.max_variable}")
+		elif not task.completed and task.max_variable == "":
 			print(f"[{task.id_task}][X]{task.description}")
 	for task in tasks:
-		if task.completed:
+		if task.completed and task.max_variable != "":
+			print(f"[{task.id_task}][√]{task.description} {task.variable}/{task.max_variable}")
+		elif task.completed and task.max_variable == "":
 			print(f"[{task.id_task}][√]{task.description}")
 
 
@@ -33,8 +37,30 @@ def add_task():
 Назови твою задачу
 
 :""")
+	chh = input("""
+
+Нужно ли вам значение выполненной части задачи?
+
+
+1)Да
+2)Нет
+
+""")
+
+	if chh == "1":
+		max_v = input("""
+
+:
+
+""")
+	elif chh == "2":
+		pass
+
 	if not description.isspace() and description != '':
-		task = Task(description, False, gni())
+		if chh == "1":
+			task = Task(description, False, gni(), max_v, 0)
+		if chh == "2":
+			task = Task(description, False, gni())
 		tasks.append(task)
 		last_id = last_id+1
 		save()
@@ -43,7 +69,7 @@ def add_task():
 
 
 def del_task(c=tasks):
-	input_id = input("Напишите номер дела(начиная от 0):")
+	input_id = input("Напишите номер дела:")
 	if validate_id(input_id, tasks):
 		for index, task in enumerate(tasks):
 			if task.id_task == int(input_id):
@@ -56,8 +82,9 @@ def del_task(c=tasks):
 
 	view_list()
 
+
 def completed_task(c=tasks):
-	index1 = input("Напишите номер дела(начиная от 0):")
+	index1 = input("Напишите номер дела:")
 	if validate_id(index1, tasks):
 		for index, task in enumerate(tasks):
 			if task.id_task == int(index1):
@@ -70,6 +97,38 @@ def completed_task(c=tasks):
 	view_list()
 
 
+def add_to_variable():
+	choose = ""
+	choose2 = ""
+	add = 0
+
+	choose = input("""
+
+'ДОБАВИТЬ' или 'УСТАНОВИТЬ'? 
+
+1)Добавить
+2)Устновить
+
+: """)
+	if choose == "1":
+		choose2 == int(input("""
+
+Напишите номер дела:
+
+"""))
+		add = int(input("""
+
+Сколько добавить?
+
+:
+"""))
+		if validate_id(choose2, tasks):
+			for index, task in enumerate(tasks):
+				if task.id_task == int(choose2):
+					task.variable = task.variable + add
+					save()
+
+				
 
 
 
@@ -98,8 +157,10 @@ def save():
 	global fail_w
 	with open(file_w, "w") as file:
 		for task in tasks:
-			file.write(f"{task.id_task};{task.completed};{task.description}\n")
-
+			if task.max_variable == "":
+				file.write(f"{task.id_task};{task.completed};{task.description}\n")
+			else:
+				file.write(f"{task.id_task};{task.completed};{task.description};{task.max_variable};{task.variable}\n")
 
 def load():
 	global last_id
@@ -111,14 +172,26 @@ def load():
 		for line in lines:
 			if line != "":
 				elements = line.split(";")
-				ids = int(elements[0])
-				descr = str(elements[2])
-				if elements[1] == "True":
-					task = Task(descr, True, ids)
-				else:
-					task = Task(descr, False, ids)
-				tasks.append(task)
-				last_id=last_id+1
+				if len(elements) == 5:
+					ids = int(elements[0])
+					descr = str(elements[2])
+					max_v = int(elements[3])
+					v = int(elements[4])
+					if elements[1] == "True":
+						task = Task(descr, True, ids, max_v, v)
+					else:
+						task = Task(descr, False, ids, max_v, v)
+					tasks.append(task)
+					last_id=last_id+1
+				elif len(elements) == 3:
+					ids = int(elements[0])
+					descr = str(elements[2])
+					if elements[1] == "True":
+						task = Task(descr, True, ids)
+					else:
+						task = Task(descr, False, ids)
+					tasks.append(task)
+					last_id=last_id+1
 	view_list()
 
 
@@ -136,11 +209,12 @@ def change_file():
 
 
 def retry():
-	with open(parameters_file, "r") as file:
-		if file.read() != "":
-			return True
-		else:
-			return False
+	if os.path.isfile(parameters_file):
+		with open(parameters_file, "r") as file:
+			if file.read() != "":
+				return True
+			else:
+				return False
 
 #########
 
@@ -185,3 +259,4 @@ def load_g():
 
 
 ##################################
+

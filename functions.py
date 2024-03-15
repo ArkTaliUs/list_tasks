@@ -19,14 +19,14 @@ tasks = []
 #Main Function
 def view_list():
 	for task in tasks:
-		if not task.completed and task.max_variable != "":
+		if not task.completed and task.max_variable != 0:
 			print(f"[{task.id_task}][X]{task.description} {task.variable}/{task.max_variable}")
-		elif not task.completed and task.max_variable == "":
+		elif not task.completed and task.max_variable == 0:
 			print(f"[{task.id_task}][X]{task.description}")
 	for task in tasks:
-		if task.completed and task.max_variable != "":
+		if task.completed and task.max_variable != 0:
 			print(f"[{task.id_task}][√]{task.description} {task.variable}/{task.max_variable}")
-		elif task.completed and task.max_variable == "":
+		elif task.completed and task.max_variable == 0:
 			print(f"[{task.id_task}][√]{task.description}")
 
 
@@ -100,7 +100,7 @@ def completed_task(c=tasks):
 
 
 def add_to_variable():
-	number=''
+	number=0
 	choose = input("""
 
 'ДОБАВИТЬ' или 'УСТАНОВИТЬ'? 
@@ -125,7 +125,8 @@ def add_to_variable():
 			for task in tasks:
 				if task.id_task == int(number):
 					task.variable = task.variable + add
-					if task.variable >= task.max_variable:
+					print(task.max_variable)
+					if task.variable >= int(task.max_variable):
 						task.completed = True
 
 						save()

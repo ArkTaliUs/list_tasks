@@ -110,22 +110,25 @@ def add_to_variable():
 
 : """)
 	if choose == "1":
-		number == int(input("""
+		number = int(input("""
 
 Напишите номер дела:
 
 """))
-		add = input("""
+		add = int(input("""
 
 Сколько добавить?
 
 :
-""")
-		for task in tasks:
-			if task.id_task == int(number):
-				task.variable = task.variable + add
-				print(task.variable)
-				save()
+"""))
+		if validate_id(str(number), tasks):
+			for task in tasks:
+				if task.id_task == int(number):
+					task.variable = task.variable + add
+					if task.variable >= task.max_variable:
+						task.completed = True
+
+						save()
 
 					
 

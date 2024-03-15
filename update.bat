@@ -1,7 +1,8 @@
 @echo off
-set /p choice= "Please Select one of the above options :" 
+chcp 65001
+set /p name= "Пожалуйста, введите название:" 
 
 
 git add -A
-git commit -m "update"
+git commit -m "%name%"
 git push origin main

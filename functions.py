@@ -59,10 +59,12 @@ def add_task():
 	if not description.isspace() and description != '':
 		if chh == "1":
 			task = Task(description, False, gni(), max_v, 0)
+			last_id = last_id+1
 		if chh == "2":
 			task = Task(description, False, gni())
+			last_id = last_id+1
 		tasks.append(task)
-		last_id = last_id+1
+
 		save()
 		view_list()
 
@@ -98,10 +100,7 @@ def completed_task(c=tasks):
 
 
 def add_to_variable():
-	choose = ""
-	choose2 = ""
-	add = 0
-
+	number=''
 	choose = input("""
 
 'ДОБАВИТЬ' или 'УСТАНОВИТЬ'? 
@@ -111,22 +110,24 @@ def add_to_variable():
 
 : """)
 	if choose == "1":
-		choose2 == int(input("""
+		number == int(input("""
 
 Напишите номер дела:
 
 """))
-		add = int(input("""
+		add = input("""
 
 Сколько добавить?
 
 :
-"""))
-		if validate_id(choose2, tasks):
-			for index, task in enumerate(tasks):
-				if task.id_task == int(choose2):
-					task.variable = task.variable + add
-					save()
+""")
+		for task in tasks:
+			if task.id_task == int(number):
+				task.variable = task.variable + add
+				print(task.variable)
+				save()
+
+					
 
 				
 

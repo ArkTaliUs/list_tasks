@@ -20,14 +20,14 @@ tasks = []
 def view_list():
 	for task in tasks:
 		if not task.completed and task.max_variable != 0:
-			print(f"[{task.id_task}][X]{task.description} {task.variable}/{task.max_variable}")
+			print(f"({task.tag})[{task.id_task}][X]{task.description} {task.variable}/{task.max_variable}")
 		elif not task.completed and task.max_variable == 0:
-			print(f"[{task.id_task}][X]{task.description}")
+			print(f"({task.tag})[{task.id_task}][X]{task.description}")
 	for task in tasks:
 		if task.completed and task.max_variable != 0:
-			print(f"[{task.id_task}][√]{task.description} {task.variable}/{task.max_variable}")
+			print(f"({task.tag})[{task.id_task}][√]{task.description} {task.variable}/{task.max_variable}")
 		elif task.completed and task.max_variable == 0:
-			print(f"[{task.id_task}][√]{task.description}")
+			print(f"({task.tag})[{task.id_task}][√]{task.description}")
 
 
 #FUNCTIONS
@@ -122,18 +122,82 @@ def add_to_variable():
 :
 """))
 		if validate_id(str(number), tasks):
-			for task in tasks:
-				if task.id_task == int(number):
-					task.variable = task.variable + add
-					print(task.max_variable)
-					if task.variable >= int(task.max_variable):
-						task.completed = True
+				for task in tasks:
+					if task.max_variable != 0:
+						if task.id_task == int(number):
+							task.variable = task.variable + add
+							if task.variable >= int(task.max_variable):
+								task.completed = True
 
-						save()
 
+
+	if choose == "2":
+		number = int(input("""
+
+Напишите номер дела:
+
+"""))
+		sets = int(input("""
+
+Сколько присвоить?
+
+:
+"""))	
+		if validate_id(str(number), tasks):
+				for task in tasks:
+					if task.max_variable != 0:
+						if task.id_task == int(number):
+							task.variable = sets
+							if task.variable >= int(task.max_variable):
+								task.completed = True
 					
 
-				
+	save()
+
+	view_list()
+
+def tag():
+	idtag = input("""
+Введите id задачи, к которой вы хотите присвоить тэг:
+
+""")
+	tagsymbol = input("""
+Введите символ тэга:""")
+
+	if validate_id(idtag, tasks):
+		for task in tasks:
+			if task.id_task == int(idtag):
+				task.tag = tagsymbol	
+				save()
+				view_list()
+					
+
+def tags_tasks():
+	tr = False
+	tag = input("""
+		
+Введите тэг:
+
+""")
+	print("\n")
+	for task in tasks:
+		if task.tag == tag:
+
+			tr = True
+			if not task.completed and task.max_variable != 0:
+				print(f"({task.tag})[{task .id_task}][X]{task.description} {task.variable}/{task.max_variable}")
+			elif not task.completed and task.max_variable == 0:
+				print(f"({task.tag})[{task.id_task}][X]{task.description}")	
+			elif task.completed and task.max_variable != 0:
+				print(f"({task.tag})[{task.id_task}][√]{task.description} {task.variable}/{task.max_variable}")
+			elif task.completed and task.max_variable == 0:
+				print(f"({task.tag})[{task.id_task}][√]{task.description}")
+	if not tr:
+		print("""
+
+Задачи с тэгом не найдено:(
+
+ """)
 
 
 
@@ -165,36 +229,27 @@ def save():
 			if task.max_variable == "":
 				file.write(f"{task.id_task};{task.completed};{task.description}\n")
 			else:
-				file.write(f"{task.id_task};{task.completed};{task.description};{task.max_variable};{task.variable}\n")
+				file.write(f"{task.id_task};{task.completed};{task.description};{task.max_variable};{task.variable};{task.tag}\n")
 
 def load():
 	global last_id
 	global file_w
-	last_id = 0
 	with open(file_w, "r") as file:
 		alls = file.read()
 		lines = alls.split("\n")
 		for line in lines:
 			if line != "":
 				elements = line.split(";")
-				if len(elements) == 5:
+				if len(elements) == 6:
 					ids = int(elements[0])
 					descr = str(elements[2])
 					max_v = int(elements[3])
 					v = int(elements[4])
+					tag = str(elements[5])
 					if elements[1] == "True":
-						task = Task(descr, True, ids, max_v, v)
+						task = Task(descr, True, ids, max_v, v, tag)
 					else:
-						task = Task(descr, False, ids, max_v, v)
-					tasks.append(task)
-					last_id=last_id+1
-				elif len(elements) == 3:
-					ids = int(elements[0])
-					descr = str(elements[2])
-					if elements[1] == "True":
-						task = Task(descr, True, ids)
-					else:
-						task = Task(descr, False, ids)
+						task = Task(descr, False, ids, max_v, v, tag)
 					tasks.append(task)
 					last_id=last_id+1
 	view_list()
@@ -203,6 +258,7 @@ def load():
 def change_file():
 	global file_w
 	global tasks
+	last_id = 0
 	tasks = []
 	file_w = input("Назовите путь или имя файла: \n") + ".txt"
 	if os.path.isfile(file_w):
@@ -211,6 +267,8 @@ def change_file():
 		load()
 	else: 
 		save()
+		
+	save_admin_edit(file_w)
 
 
 def retry():
@@ -220,6 +278,8 @@ def retry():
 				return True
 			else:
 				return False
+
+
 
 #########
 
@@ -264,4 +324,3 @@ def load_g():
 
 
 ##################################
-
